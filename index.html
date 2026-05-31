@@ -590,7 +590,7 @@ function aplicarFiltro(){
     const r2=[
       {l:'Pendiente de cobro',v:fmt(_raw_data.cf.pe),        c:'#ff5c5c', s:'total acumulado'},
       {l:'Comisiones',        v:fmt(_raw_data.comisiones||0), c:'#f5a623', s:'Stripe · PayPal · Secura'},
-      {l:'Pendiente repartir', v:fmt(benMes-yRMes),           c:'#a78bfa', s:'beneficio – repartido · '+mes},
+      {l:'Pendiente repartir', v:fmt(_raw_data.res.tB-_raw_data.rep.yR), c:'#a78bfa', s:'total acumulado'},
       {l:'Cash disponible',   v:fmt(_raw_data.cf.sC),         c:'#00c896', s:'total acumulado'},
     ];
     const rk=(kk,id)=>document.getElementById(id).innerHTML=kk.map(k=>`<div class="kpi"><div class="kpi-bar" style="background:${k.c}"></div><div class="kpi-lbl">${k.l}</div><div class="kpi-val" style="color:${k.c}">${k.v}</div><div class="kpi-sub">${k.s}</div></div>`).join('');
