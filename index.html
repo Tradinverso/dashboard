@@ -312,7 +312,7 @@ function rKPIs(res,cf,rep){
   ];
   const r2=[
     {l:'Pendiente de cobro', v:fmt(cf.pe),           c:'#ff5c5c', s:'por cobrar'},
-    {l:'Comisiones',         v:fmt(res.tC), c:'#f5a623', s:'Stripe · PayPal · Secura'},
+    {l:'Comisiones',         v:fmt(res.tC), c:'#f5a623', s:'Stripe · PayPal · Sequra'},
     {l:'Beneficio en negocio', v:fmt(res.tB-rep.yR),   c:'#a78bfa', s:'beneficio – repartido'},
     {l:'Cash disponible',    v:fmt(cf.sC),           c:'#00c896', s:'saldo en caja'},
   ];
@@ -664,9 +664,9 @@ function rProximos(prox){
           <span style="font-family:var(--fm);font-size:12px;font-weight:500;color:var(--text);">${m.label}</span>
           <span style="font-family:var(--fm);font-size:13px;font-weight:600;color:var(--green);">${fmt(m.total)}</span>
         </div>
-        ${m.items.map(i=>`<div style="display:flex;justify-content:space-between;font-family:var(--fm);font-size:11px;padding:3px 0;">
-          <span style="color:var(--muted);">${i.cl} <span style="color:var(--dim);">· ${i.mt}</span>${i.atrasado?' <span style="color:var(--red);font-size:9px;">ATRASADO</span>':''}</span>
-          <span style="color:${i.atrasado?'var(--red)':'var(--text)'};">${fmt(i.importe)}</span>
+        ${m.items.slice().sort((a,b)=>a.fecha-b.fecha).map(i=>`<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-family:var(--fm);font-size:11px;padding:3px 0;">
+          <span style="color:var(--muted);"><span style="color:${i.atrasado?'var(--red)':'var(--green)'};font-size:10px;">${String(i.fecha.getDate()).padStart(2,'0')}/${String(i.fecha.getMonth()+1).padStart(2,'0')}</span> ${i.cl} <span style="color:var(--dim);">· ${i.mt}</span>${i.atrasado?' <span style="color:var(--red);font-size:9px;">ATRASADO</span>':''}</span>
+          <span style="color:${i.atrasado?'var(--red)':'var(--text)'};white-space:nowrap;">${fmt(i.importe)}</span>
         </div>`).join('')}
       </div>`;
     }).join('');
