@@ -432,7 +432,7 @@ function rGastos(g){
     <td style="font-weight:600">${x.pr}</td>
     <td style="color:var(--muted);font-size:12px;">${x.co}</td>
     <td style="font-family:var(--fm);font-size:11px;color:var(--dim);">${x.ca||'—'}</td>
-    <td><span class="badge ${x.mt&&x.mt.includes('binance')?'ba':'bb'}">${x.mt&&x.mt.includes('binance')?'Binance':'FYRST'}</span></td>
+    <td><span class="badge ${x.mt&&(x.mt.includes('binance')||x.mt.includes('cripto'))?'ba':'bb'}">${x.mt&&(x.mt.includes('binance')||x.mt.includes('cripto'))?'Cripto':'FYRST'}</span></td>
     <td style="font-family:var(--fm);font-size:11px;color:var(--dim);">${x.me}</td>
     <td style="font-family:var(--fm);font-size:12px;color:var(--amber);">${fmt(x.im)}</td>
   </tr>`).join(''):'<tr><td colspan="6" style="color:var(--dim);font-size:12px;">Sin gastos</td></tr>';
@@ -481,8 +481,8 @@ function rPendientes(v){
 function rSaldos(ing,rep,gastosTot){
   let rC=0,rB=0;
   for(const h of rep.h){const cu=(h.cu||'').toLowerCase();if(cu.includes('cripto')||cu.includes('binance')) rC+=h.to; else rB+=h.to;}
-  const gastosBinance=_raw_data.gastos.reduce((s,g)=>s+(g.mt&&g.mt.includes('binance')?g.im:0),0);
-  const gastosFyrst=_raw_data.gastos.reduce((s,g)=>s+(g.mt&&g.mt.includes('binance')?0:g.im),0);
+  const gastosBinance=_raw_data.gastos.reduce((s,g)=>s+(g.mt&&(g.mt.includes('binance')||g.mt.includes('cripto'))?g.im:0),0);
+  const gastosFyrst=_raw_data.gastos.reduce((s,g)=>s+(g.mt&&(g.mt.includes('binance')||g.mt.includes('cripto'))?0:g.im),0);
   const sC=ing.cC-rC-gastosBinance;
   const sB=ing.cB-rB-gastosFyrst;
   // Pendiente por cuenta
