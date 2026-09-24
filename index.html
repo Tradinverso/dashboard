@@ -84,7 +84,7 @@ tr:last-child td{border-bottom:none;}
   <div class="hdr-right">
     <div class="hdr-meta">Actualizado: <span id="last-upd">—</span></div>
     <button class="btn" id="theme-btn" onclick="toggleTheme()" title="Modo claro/oscuro">☀</button>
-    <button class="btn" onclick="loadAll()">↻ Actualizar</button>
+    <button class="btn" onclick="_cacheUsada=false;loadAll()">↻ Actualizar</button>
   </div>
 </header>
 <main>
@@ -545,6 +545,7 @@ try{if(localStorage.getItem('ti_theme')==='light'){document.body.classList.add('
 // ── ESTADO GLOBAL Y FILTROS ─────────────────────
 let _raw_data = {ventas:[], gastos:[], rep:null, res:null, cf:null, ing:null};
 let _mes_activo = 'todos';
+let _cacheUsada = true;
 const MESES_NUM = {Ene:1,Feb:2,Mar:3,Abr:4,May:5,Jun:6,Jul:7,Ago:8,Sep:9,Oct:10,Nov:11,Dic:12};
 
 function setMes(mes){
@@ -556,7 +557,7 @@ function setMes(mes){
 
 function buildFilterBar(mesesConDatos){
   const bar = document.getElementById('filter-bar');
-  bar.querySelectorAll('.mes-btn:not(#btn-todos)').forEach(b=>b.remove());
+  [...bar.querySelectorAll('.mes-btn')].forEach((b,i)=>{ if(b.id!=='btn-todos'||i>0) b.remove(); });
   mesesConDatos.forEach(m=>{
     const btn = document.createElement('button');
     btn.className='mes-btn has-data';
@@ -680,9 +681,16 @@ async function loadAll(){
   document.getElementById('ld-fill').style.width='0%';
   try{
     sl(15,'Conectando con Google Sheets...');
-    let raw;
-    try{ raw=await jsonp(API); }
-    catch(e1){ sl(25,'Reintentando conexion...'); raw=await jsonp(API); }
+    let raw=null, desdeCache=false;
+    try{
+      const guardado = _cacheUsada ? localStorage.getItem('ti_cache') : null;
+      if(guardado){ raw = JSON.parse(guardado); desdeCache = true; }
+    }catch(eC){}
+    if(!raw){
+      try{ raw=await jsonp(API); }
+      catch(e1){ sl(25,'Reintentando conexion...'); raw=await jsonp(API); }
+      try{ localStorage.setItem('ti_cache', JSON.stringify(raw)); }catch(eS){}
+    }
     sl(70,'Procesando datos...');
     const find=(...names)=>{for(const name of names){const key=Object.keys(raw).find(k=>k.toUpperCase()===name.toUpperCase());if(key) return raw[key];}return[];};
     const res=pRes(find('RESUMEN'));
@@ -718,7 +726,13 @@ async function loadAll(){
     rProximos(ing.prox);
     rCashFlow(cf);
     rSaldos(ing,rep,gastosTot);
-    document.getElementById('last-upd').textContent=new Date().toLocaleTimeString('es-ES');
+    document.getElementById('last-upd').textContent=new Date().toLocaleTimeString('es-ES')+(desdeCache?' (cache)':'');
+    if(desdeCache){
+      jsonp(API).then(function(fresco){
+        try{ localStorage.setItem('ti_cache', JSON.stringify(fresco)); }catch(e){}
+        _cacheUsada=false; loadAll();
+      }).catch(function(){});
+    }
     sl(100,'Listo');
     setTimeout(()=>document.getElementById('loader').classList.add('out'),400);
   }catch(e){
