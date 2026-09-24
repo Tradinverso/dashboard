@@ -221,7 +221,7 @@ function jsonp(url){
   return new Promise((res,rej)=>{
     const cb='cb_'+Math.random().toString(36).slice(2);
     const s=document.createElement('script');
-    const t=setTimeout(()=>{delete window[cb];document.body.removeChild(s);rej(new Error('Timeout'));},20000);
+    const t=setTimeout(()=>{delete window[cb];document.body.removeChild(s);rej(new Error('Timeout'));},45000);
     window[cb]=d=>{clearTimeout(t);delete window[cb];document.body.removeChild(s);res(d);};
     s.src=url+'?callback='+cb;
     s.onerror=()=>{clearTimeout(t);rej(new Error('Script error'));};
@@ -680,7 +680,9 @@ async function loadAll(){
   document.getElementById('ld-fill').style.width='0%';
   try{
     sl(15,'Conectando con Google Sheets...');
-    const raw=await jsonp(API);
+    let raw;
+    try{ raw=await jsonp(API); }
+    catch(e1){ sl(25,'Reintentando conexion...'); raw=await jsonp(API); }
     sl(70,'Procesando datos...');
     const find=(...names)=>{for(const name of names){const key=Object.keys(raw).find(k=>k.toUpperCase()===name.toUpperCase());if(key) return raw[key];}return[];};
     const res=pRes(find('RESUMEN'));
